@@ -1,0 +1,8 @@
+{
+  "name": "Blend Social",
+  "description": "A unified social platform combining features of video, images, text, and chat in a unique, dark-themed interface.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
