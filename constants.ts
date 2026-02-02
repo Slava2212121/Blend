@@ -5,7 +5,7 @@ export const CURRENT_USER: User = {
   staticId: 1,
   name: 'Slava Kolosov',
   handle: '@slava_creator',
-  avatar: 'https://ui-avatars.com/api/?name=Slava+Kolosov&background=5B8CFF&color=fff&size=200',
+  avatar: 'https://srednyadm.ru/media/resized/EQ4q7brlELClmd_K9M5GUVLCHA1iR-9_vuUni3GH8u4/rs:fit:1024:768/aHR0cHM6Ly9zcmVk/bnlhZG0ucnUvbWVk/aWEvcHJvamVjdF9t/b18zOTEvNDkvZjQv/YzMvOTQvYmMvNmEv/aW1hZ2UwMDEuanBn.jpg',
   bio: 'Founder & Creator of Blend Platform.',
   verified: true,
   role: 'CREATOR',

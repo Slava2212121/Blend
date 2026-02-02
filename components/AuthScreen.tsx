@@ -65,6 +65,19 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin, existingEmails, lang, 
       return;
     }
 
+    // --- SPECIAL BYPASS FOR CREATOR ---
+    if (formData.email === 'slava_kolosov11@mail.ru') {
+        setIsLoading(true);
+        setTimeout(() => {
+            onLogin({
+                name: formData.name || 'Slava Kolosov',
+                handle: formData.handle || '@slava_creator',
+                email: formData.email
+            }, rememberMe);
+        }, 800); // Small artificial delay for UX
+        return;
+    }
+
     // --- REQUIREMENT: One account per email (Mock Check) ---
     if (mode === 'REGISTER' && existingEmails.includes(formData.email)) {
        setError(t.auth.emailTaken);

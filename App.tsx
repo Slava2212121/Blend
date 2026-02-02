@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Home, 
@@ -28,11 +29,9 @@ import {
   FileText,
   Globe,
   Key,
-  Smartphone,
   Laptop,
   ToggleLeft,
   ToggleRight,
-  Lock
 } from 'lucide-react';
 import { CURRENT_USER, MOCK_POSTS, MOCK_CHATS, TRENDS } from './constants';
 import { FeedMode, Post, PostType, Language, Chat, Message, MessageType, User, Comment, Theme } from './types';
@@ -43,9 +42,13 @@ import ChatInterface from './components/ChatInterface';
 import AuthScreen from './components/AuthScreen';
 import MixControls from './components/MixControls';
 import LegalModal from './components/LegalModal';
+import AdminPanel from './components/AdminPanel';
 import { TRANSLATIONS } from './translations';
+import { moderateContent } from './utils/aiModeration';
 
-type ViewState = 'HOME' | 'CHATS' | 'PROFILE' | 'NOTIFICATIONS' | 'EXPLORE' | 'SETTINGS';
+type ViewState = 'HOME' | 'CHATS' | 'PROFILE' | 'NOTIFICATIONS' | 'EXPLORE' | 'SETTINGS' | 'ADMIN';
+
+const APP_VERSION = 'v1.0';
 
 // Security Configuration
 const SECURITY_CONFIG = {
@@ -236,6 +239,7 @@ const App: React.FC = () => {
           verified: false,
           isOfficial: false,
           isActive: false,
+          isBanned: false,
           avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=random`
         };
       }
@@ -305,6 +309,12 @@ const App: React.FC = () => {
        return;
     }
 
+    // --- AI MODERATION CHECK ---
+    const moderation = moderateContent(cleanContent || '');
+    if (moderation.flagged) {
+        setSecurityWarning(t.post.hiddenBody); // Use translation
+    }
+
     const newPost: Post = {
       id: `p${Date.now()}`,
       author: currentUser,
@@ -320,7 +330,12 @@ const App: React.FC = () => {
       shares: 0,
       views: 0,
       popularityScore: 0,
-      mixExplanation: 'Your new post'
+      mixExplanation: 'Your new post',
+      
+      // Moderation Flags
+      isFlagged: moderation.flagged,
+      isHidden: moderation.flagged,
+      flagReason: moderation.reason
     };
     setPosts([newPost, ...posts]);
     setStats(prev => ({ ...prev, totalPosts: prev.totalPosts + 1 }));
@@ -348,6 +363,13 @@ const App: React.FC = () => {
     const cleanText = sanitizeInput(text);
     if (!cleanText) return;
 
+    // Optional: Moderate comments too
+    const moderation = moderateContent(cleanText);
+    if (moderation.flagged) {
+       setSecurityWarning('Comment blocked by AI: ' + moderation.reason);
+       return;
+    }
+
     const newComment: Comment = {
       id: `cm${Date.now()}`,
       author: currentUser,
@@ -373,8 +395,15 @@ const App: React.FC = () => {
   };
 
   const getSortedPosts = () => {
-    // Basic sorting since there's no real algorithm without backend
-    return [...posts].sort((a, b) => b.id.localeCompare(a.id));
+    // 1. Filter out hidden posts unless user is Admin or Owner
+    const viewablePosts = posts.filter(p => {
+        if (!p.isHidden) return true;
+        if (currentUser.role === 'ADMIN' || currentUser.role === 'MODERATOR') return true;
+        if (p.author.id === currentUser.id) return true;
+        return false;
+    });
+
+    return [...viewablePosts].sort((a, b) => b.id.localeCompare(a.id));
   };
 
   const handleSendMessage = (chatId: string, text: string, type: MessageType = MessageType.TEXT, audioDuration?: string) => {
@@ -407,6 +436,45 @@ const App: React.FC = () => {
     }));
   };
 
+  // --- ADMIN ACTIONS ---
+  const handleBanUser = (userId: string) => {
+     // 1. Update user state (simulated by updating author info in all posts)
+     const isBanning = !posts.find(p => p.author.id === userId)?.author.isBanned;
+
+     setPosts(prev => prev.map(p => {
+        if (p.author.id === userId) {
+           return {
+              ...p,
+              isHidden: isBanning, // Hide posts if banned
+              author: {
+                 ...p.author,
+                 isBanned: isBanning
+              }
+           }
+        }
+        return p;
+     }));
+     
+     // Update current user if self-ban (unlikely but possible in test)
+     if (userId === currentUser.id) {
+        setCurrentUser(prev => ({ ...prev, isBanned: isBanning }));
+     }
+  };
+
+  const handleDeletePost = (postId: string) => {
+     setPosts(prev => prev.filter(p => p.id !== postId));
+  };
+
+  const handleDismissReport = (postId: string) => {
+     setPosts(prev => prev.map(p => {
+        if (p.id === postId) {
+           return { ...p, isFlagged: false, isHidden: false, flagReason: undefined };
+        }
+        return p;
+     }));
+  };
+
+
   const NavItem = ({ icon: Icon, label, active, onClick }: any) => (
     <button 
       onClick={onClick}
@@ -423,8 +491,9 @@ const App: React.FC = () => {
 
   const renderExploreView = () => {
     const filteredPosts = posts.filter(post => 
-      post.content.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      post.author.name.toLowerCase().includes(searchQuery.toLowerCase())
+      !post.isHidden && // Don't show hidden posts in explore
+      (post.content.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      post.author.name.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     return (
@@ -755,9 +824,9 @@ const App: React.FC = () => {
       
       {/* Security Toast */}
       {securityWarning && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-[#FF5B5B] text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 animate-in slide-in-from-top-4 fade-in font-medium">
-          <AlertTriangle size={20} className="fill-white stroke-[#FF5B5B]" />
-          {securityWarning}
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-[#FF5B5B] text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 animate-in slide-in-from-top-4 fade-in font-medium max-w-md w-full text-center justify-center">
+          <AlertTriangle size={20} className="fill-white stroke-[#FF5B5B] shrink-0" />
+          <span className="text-sm">{securityWarning}</span>
         </div>
       )}
 
@@ -798,6 +867,12 @@ const App: React.FC = () => {
             <NavItem icon={MessageSquare} label={t.nav.chats} active={currentView === 'CHATS'} onClick={() => { setCurrentView('CHATS'); setIsMobileMenuOpen(false); }} />
             <NavItem icon={Bell} label={t.nav.activity} active={currentView === 'NOTIFICATIONS'} onClick={() => { setCurrentView('NOTIFICATIONS'); setIsMobileMenuOpen(false); }} />
             <NavItem icon={UserIcon} label={t.nav.profile} active={currentView === 'PROFILE'} onClick={() => { setCurrentView('PROFILE'); setIsMobileMenuOpen(false); }} />
+            
+            {/* Admin Panel Link - Only for specific roles */}
+            {(currentUser.role === 'ADMIN' || currentUser.role === 'MODERATOR' || currentUser.role === 'CREATOR') && (
+              <NavItem icon={ShieldAlert} label={t.nav.admin} active={currentView === 'ADMIN'} onClick={() => { setCurrentView('ADMIN'); setIsMobileMenuOpen(false); }} />
+            )}
+            
             <NavItem icon={Settings} label={t.nav.settings} active={currentView === 'SETTINGS'} onClick={() => { setCurrentView('SETTINGS'); setIsMobileMenuOpen(false); }} />
           </nav>
 
@@ -816,6 +891,12 @@ const App: React.FC = () => {
                 <p className="text-sm font-bold truncate text-[var(--text-main)]">{currentUser.name}</p>
                 <p className="text-xs text-[var(--text-muted)] truncate">{currentUser.handle}</p>
               </div>
+            </div>
+            
+            {/* Version Display */}
+            <div className="px-2 pt-2 border-t border-[var(--border)] flex justify-between text-[10px] text-[var(--text-muted)]">
+               <span>Blend Platform</span>
+               <span>{APP_VERSION}</span>
             </div>
           </div>
         </aside>
@@ -854,7 +935,7 @@ const App: React.FC = () => {
 
               {/* Feed Content */}
               <div className="p-4">
-                {posts.length > 0 ? getSortedPosts().map(post => (
+                {getSortedPosts().length > 0 ? getSortedPosts().map(post => (
                   <PostCard 
                     key={post.id} 
                     post={post} 
@@ -903,6 +984,17 @@ const App: React.FC = () => {
           {currentView === 'NOTIFICATIONS' && renderActivityView()}
           {currentView === 'PROFILE' && renderProfileView()}
           {currentView === 'SETTINGS' && renderSettingsView()}
+          {currentView === 'ADMIN' && (
+             <AdminPanel 
+                currentUser={currentUser} 
+                posts={posts} 
+                stats={stats} 
+                t={t}
+                onBanUser={handleBanUser}
+                onDeletePost={handleDeletePost}
+                onDismissReport={handleDismissReport}
+             />
+          )}
 
         </main>
 

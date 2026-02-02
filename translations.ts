@@ -1,3 +1,4 @@
+
 export const TRANSLATIONS = {
   en: {
     nav: {
@@ -8,6 +9,7 @@ export const TRANSLATIONS = {
       profile: 'Profile',
       settings: 'Settings',
       create: 'Create',
+      admin: 'Panel'
     },
     feed: {
       mix: 'Mix',
@@ -70,7 +72,10 @@ export const TRANSLATIONS = {
       comments: 'Comments',
       writeComment: 'Write a comment...',
       shareToast: 'Link copied to clipboard!',
-      shares: 'shares'
+      shares: 'shares',
+      hiddenTitle: 'Content Under Review',
+      hiddenBody: 'This post has been flagged by our AI moderation system for potential policy violations.',
+      reveal: 'View Anyway (Admin)'
     },
     explore: {
       search: 'Search Blend...',
@@ -89,7 +94,8 @@ export const TRANSLATIONS = {
         creator: 'CREATOR',
         moderator: 'MODERATOR',
         official: 'OFFICIAL',
-        active: 'ACTIVE'
+        active: 'ACTIVE',
+        banned: 'BANNED'
       }
     },
     activity: {
@@ -116,6 +122,39 @@ export const TRANSLATIONS = {
       changePassword: 'Change Password',
       activeSessions: 'Active Sessions',
       activeNow: 'Active Now'
+    },
+    admin: {
+      title: 'Admin Panel',
+      welcome: 'Welcome back',
+      tabs: {
+        dashboard: 'Dashboard',
+        users: 'Users',
+        reports: 'Moderation'
+      },
+      stats: {
+        totalUsers: 'Total Users',
+        activePosts: 'Active Posts',
+        reports: 'Pending Reports',
+        server: 'Server Load'
+      },
+      health: 'System Health',
+      usersList: {
+        title: 'User Management',
+        search: 'Search users...',
+        colUser: 'User',
+        colRole: 'Role',
+        colStatus: 'Status',
+        colActions: 'Actions',
+        ban: 'Ban',
+        unban: 'Unban'
+      },
+      reportsList: {
+        title: 'Flagged Content (AI)',
+        empty: 'All clean! No pending reports.',
+        delete: 'Delete Post',
+        keep: 'Keep/Approve',
+        banUser: 'Ban User'
+      }
     },
     auth: {
       welcome: 'Welcome to Blend',
@@ -182,6 +221,7 @@ export const TRANSLATIONS = {
       profile: 'Профиль',
       settings: 'Настройки',
       create: 'Создать',
+      admin: 'Панель'
     },
     feed: {
       mix: 'Микс',
@@ -244,7 +284,10 @@ export const TRANSLATIONS = {
       comments: 'Комментарии',
       writeComment: 'Написать комментарий...',
       shareToast: 'Ссылка скопирована в буфер!',
-      shares: 'поделились'
+      shares: 'поделились',
+      hiddenTitle: 'Контент на проверке',
+      hiddenBody: 'Этот пост был скрыт системой ИИ за подозрение в нарушении правил сообщества.',
+      reveal: 'Показать (Админ)'
     },
     explore: {
       search: 'Поиск в Blend...',
@@ -263,7 +306,8 @@ export const TRANSLATIONS = {
         creator: 'СОЗДАТЕЛЬ',
         moderator: 'МОДЕРАТОР',
         official: 'ОФИЦИАЛЬНЫЙ',
-        active: 'АКТИВНЫЙ'
+        active: 'АКТИВНЫЙ',
+        banned: 'ЗАБАНЕН'
       }
     },
     activity: {
@@ -290,6 +334,39 @@ export const TRANSLATIONS = {
       changePassword: 'Сменить пароль',
       activeSessions: 'Активные сессии',
       activeNow: 'Активен сейчас'
+    },
+    admin: {
+      title: 'Панель Администратора',
+      welcome: 'С возвращением',
+      tabs: {
+        dashboard: 'Дашборд',
+        users: 'Пользователи',
+        reports: 'Модерация'
+      },
+      stats: {
+        totalUsers: 'Пользователей',
+        activePosts: 'Активные посты',
+        reports: 'Жалоб (ИИ)',
+        server: 'Нагрузка'
+      },
+      health: 'Здоровье системы',
+      usersList: {
+        title: 'Управление пользователями',
+        search: 'Поиск...',
+        colUser: 'Пользователь',
+        colRole: 'Роль',
+        colStatus: 'Статус',
+        colActions: 'Действия',
+        ban: 'Бан',
+        unban: 'Разбан'
+      },
+      reportsList: {
+        title: 'Флаги ИИ Модератора',
+        empty: 'Чисто! Нарушений не найдено.',
+        delete: 'Удалить пост',
+        keep: 'Оставить',
+        banUser: 'Забанить'
+      }
     },
     auth: {
       welcome: 'Добро пожаловать',
@@ -356,6 +433,7 @@ export const TRANSLATIONS = {
       profile: '我',
       settings: '设置',
       create: '发布',
+      admin: '面板'
     },
     feed: {
       mix: '推荐',
@@ -418,7 +496,10 @@ export const TRANSLATIONS = {
       comments: '评论',
       writeComment: '写评论...',
       shareToast: '链接已复制！',
-      shares: '分享'
+      shares: '分享',
+      hiddenTitle: '内容审核中',
+      hiddenBody: '此帖子已被 AI 审核系统标记为潜在违规。',
+      reveal: '查看（管理员）'
     },
     explore: {
       search: '搜索 Blend...',
@@ -437,7 +518,8 @@ export const TRANSLATIONS = {
         creator: '创作者',
         moderator: '版主',
         official: '官方',
-        active: '活跃'
+        active: '活跃',
+        banned: '封禁'
       }
     },
     activity: {
@@ -464,6 +546,39 @@ export const TRANSLATIONS = {
       changePassword: '更改密码',
       activeSessions: '活动会话',
       activeNow: '当前在线'
+    },
+    admin: {
+      title: '管理面板',
+      welcome: '欢迎回来',
+      tabs: {
+        dashboard: '仪表板',
+        users: '用户',
+        reports: '审核'
+      },
+      stats: {
+        totalUsers: '总用户',
+        activePosts: '活跃帖子',
+        reports: '待处理报告',
+        server: '服务器负载'
+      },
+      health: '系统健康',
+      usersList: {
+        title: '用户管理',
+        search: '搜索用户...',
+        colUser: '用户',
+        colRole: '角色',
+        colStatus: '状态',
+        colActions: '操作',
+        ban: '封禁',
+        unban: '解封'
+      },
+      reportsList: {
+        title: 'AI 标记内容',
+        empty: '太棒了！没有违规内容。',
+        delete: '删除帖子',
+        keep: '保留/批准',
+        banUser: '封禁用户'
+      }
     },
     auth: {
       welcome: '欢迎来到 Blend',

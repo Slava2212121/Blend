@@ -1,3 +1,4 @@
+
 export type UserRole = 'USER' | 'ADMIN' | 'CREATOR' | 'MODERATOR';
 export type Theme = 'DARK' | 'LIGHT' | 'GOLD';
 
@@ -11,6 +12,7 @@ export interface User {
   verified?: boolean;
   isOfficial?: boolean; // Yellow Official Status
   isActive?: boolean; // Green Active Status
+  isBanned?: boolean; // New: Banned status
   role?: UserRole; 
 }
 
@@ -45,6 +47,11 @@ export interface Post {
   views: number;
   popularityScore?: number; // For Mix algorithm
   mixExplanation?: string; // "Why am I seeing this?"
+  
+  // Moderation Fields
+  isFlagged?: boolean; // Flagged by AI or User
+  isHidden?: boolean; // Hidden from public feed
+  flagReason?: string; // Why it was flagged
 }
 
 export enum MessageType {

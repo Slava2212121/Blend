@@ -1,6 +1,7 @@
+
 import React, { useState, useRef } from 'react';
 import { Post, PostType } from '../types';
-import { Heart, MessageCircle, Share2, BarChart2, MoreHorizontal, Play, Pause, Volume2, Check, Info, Send, Crown, ShieldCheck, Shield, Zap } from 'lucide-react';
+import { Heart, MessageCircle, Share2, BarChart2, MoreHorizontal, Play, Pause, Volume2, Check, Info, Send, Crown, ShieldCheck, Shield, Zap, EyeOff, AlertTriangle, Eye, Ban } from 'lucide-react';
 
 interface PostCardProps {
   post: Post;
@@ -14,6 +15,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
   const [commentText, setCommentText] = useState('');
   const [showShareToast, setShowShareToast] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [forceReveal, setForceReveal] = useState(false);
   
   // Audio Player State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -28,6 +30,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
   const isModerator = post.author.role === 'MODERATOR';
   const isOfficial = post.author.isOfficial;
   const isActive = post.author.isActive;
+  const isBanned = post.author.isBanned;
+
+  // HIDDEN LOGIC
+  const isHidden = post.isHidden && !forceReveal;
 
   // Determine Badge Style
   let ringColor = 'border-[var(--border)]';
@@ -35,6 +41,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
   else if (isModerator) ringColor = 'border-[#5B8CFF] border-2';
   else if (isOfficial) ringColor = 'border-[#FFD700] border-2';
   else if (isActive) ringColor = 'border-[#10B981] border-2';
+  else if (isBanned) ringColor = 'border-[#FF5B5B] border-2 opacity-50';
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -71,7 +78,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
   };
 
   return (
-    <article className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden hover:bg-[var(--bg-hover)] transition-colors mb-4 relative shadow-sm">
+    <article className={`bg-[var(--bg-card)] border rounded-xl overflow-hidden hover:bg-[var(--bg-hover)] transition-colors mb-4 relative shadow-sm ${post.isFlagged ? 'border-[#FF5B5B]/50' : 'border-[var(--border)]'}`}>
       
       {/* Share Toast */}
       {showShareToast && (
@@ -79,6 +86,23 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
           <Check size={14} />
           {t.post.shareToast}
         </div>
+      )}
+
+      {/* Hidden Overlay */}
+      {isHidden && (
+         <div className="absolute inset-0 z-20 bg-[var(--bg-card)]/90 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+            <div className="w-16 h-16 bg-[#FF5B5B]/10 rounded-full flex items-center justify-center mb-4">
+               <EyeOff size={32} className="text-[#FF5B5B]" />
+            </div>
+            <h3 className="text-xl font-bold text-[var(--text-main)] mb-2">{t.post.hiddenTitle}</h3>
+            <p className="text-[var(--text-muted)] max-w-sm mb-6">{t.post.hiddenBody}</p>
+            <button 
+              onClick={() => setForceReveal(true)}
+              className="px-4 py-2 bg-[var(--bg-hover)] border border-[var(--border)] rounded-lg text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] hover:border-[var(--text-main)] transition-colors flex items-center gap-2"
+            >
+               <Eye size={16} /> {t.post.reveal}
+            </button>
+         </div>
       )}
 
       <div className="p-4">
@@ -89,7 +113,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
                <img 
                 src={post.author.avatar} 
                 alt={post.author.name} 
-                className={`w-10 h-10 rounded-full object-cover border ${ringColor}`}
+                className={`w-10 h-10 rounded-full object-cover border ${ringColor} ${isBanned ? 'grayscale' : ''}`}
               />
               
               {/* Avatar Badges */}
@@ -108,7 +132,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
                     <ShieldCheck size={10} className="text-black fill-black" />
                  </div>
               )}
-               {isActive && !isCreator && !isModerator && !isOfficial && (
+               {isActive && !isCreator && !isModerator && !isOfficial && !isBanned && (
                  <div className="absolute -bottom-1 -right-1 bg-[#10B981] rounded-full p-0.5" title="Active User">
                     <Zap size={10} className="text-white fill-white" />
                  </div>
@@ -122,7 +146,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
                   </span>
                 )}
                 
-                <span className="text-[var(--text-main)] font-medium text-sm">{post.author.name}</span>
+                <span className={`text-[var(--text-main)] font-medium text-sm ${isBanned ? 'line-through opacity-50' : ''}`}>{post.author.name}</span>
                 
                 {/* Text Badges */}
                 {isModerator && (
@@ -135,15 +159,21 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
                   <span className="bg-[#FFD700] text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1 ml-1" title="Official">
                      <ShieldCheck size={10} className="fill-black" /> {t.profile.badges.official}
                   </span>
-                ) : post.author.verified && !isModerator && !isActive && !isCreator && (
+                ) : post.author.verified && !isModerator && !isActive && !isCreator && !isBanned && (
                   <svg className="w-3 h-3 text-[var(--primary)]" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
                 )}
 
-                {isActive && (
+                {isActive && !isBanned && (
                    <span className="bg-[#10B981] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1 ml-1" title="Active User">
                      <Zap size={10} className="fill-white" /> {t.profile.badges.active}
+                  </span>
+                )}
+
+                {isBanned && (
+                   <span className="bg-[#FF5B5B] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1 ml-1" title="Banned User">
+                     <Ban size={10} /> {t.profile.badges.banned}
                   </span>
                 )}
 
@@ -155,6 +185,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, t }) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+             {post.isFlagged && (
+                <div className="text-[#FF5B5B] flex items-center gap-1 bg-[#FF5B5B]/10 px-2 py-1 rounded text-[10px] font-bold uppercase">
+                   <AlertTriangle size={10} /> FLAGGED
+                </div>
+             )}
              {post.mixExplanation && (
                 <div className="relative">
                    <button 
