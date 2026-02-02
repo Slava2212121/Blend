@@ -46,6 +46,7 @@ import AuthScreen from './components/AuthScreen';
 import MixControls from './components/MixControls';
 import LegalModal from './components/LegalModal';
 import AdminPanel from './components/AdminPanel';
+import OnboardingTutorial from './components/OnboardingTutorial';
 import { TRANSLATIONS } from './translations';
 import { moderateContent } from './utils/aiModeration';
 
@@ -66,6 +67,7 @@ const SECURITY_CONFIG = {
 };
 
 const SESSION_KEY = 'blend_session_v1';
+const TUTORIAL_KEY = 'blend_tutorial_completed';
 
 const Logo = () => (
   <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--primary-gradient-from)] to-[var(--primary-gradient-to)] flex items-center justify-center text-white font-black text-lg shadow-lg shadow-[var(--primary)]/20">
@@ -81,6 +83,9 @@ const App: React.FC = () => {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>('DARK');
+  
+  // Tutorial State
+  const [showTutorial, setShowTutorial] = useState(false);
   
   // Security State
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -153,6 +158,10 @@ const App: React.FC = () => {
         };
         setCurrentUser(hydratedUser);
         setIsAuthenticated(true);
+        
+        // Check tutorial status for existing session
+        checkTutorialStatus();
+        
         console.log(`[Auto-Login] Welcome back, ${hydratedUser.name}`);
       } catch (error) {
         console.error("Session parse error", error);
@@ -161,6 +170,19 @@ const App: React.FC = () => {
       }
     }
   }, []);
+
+  const checkTutorialStatus = () => {
+    const hasCompleted = localStorage.getItem(TUTORIAL_KEY);
+    if (!hasCompleted) {
+       // Short delay to allow rendering
+       setTimeout(() => setShowTutorial(true), 1000);
+    }
+  };
+
+  const handleTutorialComplete = () => {
+    setShowTutorial(false);
+    localStorage.setItem(TUTORIAL_KEY, 'true');
+  };
 
   // Live Stats Simulation (Very slow growth for realism now)
   useEffect(() => {
@@ -273,6 +295,9 @@ const App: React.FC = () => {
         sessionStorage.setItem(SESSION_KEY, sessionData);
         localStorage.removeItem(SESSION_KEY); // clean up other storage
     }
+
+    // Trigger Tutorial for new login
+    checkTutorialStatus();
   };
 
   const handleLogout = () => {
@@ -899,6 +924,16 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {/* Tutorial Overlay */}
+      {showTutorial && (
+        <OnboardingTutorial 
+          onClose={handleTutorialComplete} 
+          t={t} 
+          lang={lang}
+          setLang={setLang}
+        />
+      )}
+
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[var(--bg-main)]/80 backdrop-blur-md border-b border-[var(--border)] z-40 flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
@@ -914,7 +949,9 @@ const App: React.FC = () => {
       <div className="max-w-7xl mx-auto flex">
         
         {/* Left Sidebar (Navigation) */}
-        <aside className={`
+        <aside 
+          id="app-sidebar"
+          className={`
           fixed lg:sticky top-0 left-0 h-screen w-[280px] bg-[var(--bg-main)] border-r border-[var(--border)] p-4 flex flex-col z-50 transition-transform duration-300
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
@@ -946,6 +983,7 @@ const App: React.FC = () => {
           </nav>
 
           <button 
+            id="create-btn"
             onClick={() => setIsPostModalOpen(true)}
             className="mt-6 w-full bg-gradient-to-r from-[var(--primary-gradient-from)] to-[var(--primary-gradient-to)] text-white py-3.5 rounded-full font-bold text-lg hover:shadow-[0_0_20px_rgba(91,140,255,0.3)] transition-all flex items-center justify-center gap-2"
           >
@@ -976,7 +1014,7 @@ const App: React.FC = () => {
           {currentView === 'HOME' && (
             <div className="max-w-[600px] mx-auto w-full">
               {/* Feed Header */}
-              <div className="sticky top-16 lg:top-0 bg-[var(--bg-main)]/80 backdrop-blur-md z-30 border-b border-[var(--border)]">
+              <div id="feed-header" className="sticky top-16 lg:top-0 bg-[var(--bg-main)]/80 backdrop-blur-md z-30 border-b border-[var(--border)]">
                 <div className="px-4 py-4 flex items-center justify-between">
                   <div className="flex bg-[var(--bg-card)] rounded-full p-1 border border-[var(--border)]">
                     <button 
@@ -1072,7 +1110,10 @@ const App: React.FC = () => {
         </main>
 
         {/* Right Sidebar (Widgets) */}
-        <aside className="hidden xl:block w-[350px] sticky top-0 h-screen p-6 overflow-y-auto scrollbar-hide">
+        <aside 
+          id="widgets-sidebar"
+          className="hidden xl:block w-[350px] sticky top-0 h-screen p-6 overflow-y-auto scrollbar-hide"
+        >
           
           <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5 mb-6">
             <div className="flex items-center gap-2 mb-4 text-[var(--text-main)] font-bold text-lg">

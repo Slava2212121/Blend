@@ -220,6 +220,23 @@ export const TRANSLATIONS = {
           { heading: '5. Open Source', content: 'You can personally verify how your data is processed by examining our source code in the repository. We encourage security audits by the community.' }
         ]
       }
+    },
+    tutorial: {
+      welcomeTitle: 'Welcome to Blend!',
+      welcomeMessage: 'Let us show you around your new unified social platform.',
+      skip: 'Skip Tutorial',
+      next: 'Next',
+      finish: 'Finish',
+      steps: {
+        sidebar: 'Navigation',
+        sidebarDesc: 'Access your Feed, Chats, Explore, and Settings from this sidebar.',
+        feed: 'The Mix Feed',
+        feedDesc: 'Switch between "Mix" (Algorithmic) and "Chronology". Use the sliders to tune what you see!',
+        create: 'Express Yourself',
+        createDesc: 'Share text, images, videos, or record voice notes instantly.',
+        widgets: 'Trends & Stats',
+        widgetsDesc: 'See what is popular and who is online right now.'
+      }
     }
   },
   ru: {
@@ -414,7 +431,7 @@ export const TRANSLATIONS = {
       forgotPassword: 'Забыли пароль?',
       resetPassword: 'Сброс пароля',
       newPassword: 'Новый пароль',
-      passwordResetSuccess: 'Пароль успешно сброшен! Войдите.',
+      passwordResetSuccess: 'Password reset successfully! Please login.',
       sendRecovery: 'Отправить код',
       backToLogin: 'Вернуться ко входу',
       emailTaken: 'Аккаунт с таким email уже существует.'
@@ -441,6 +458,23 @@ export const TRANSLATIONS = {
           { heading: '4. Ваши права', content: 'Право на удаление: Вы можете в любой момент удалить свой аккаунт. Мы обязуемся стереть ваши личные данные из БД в течение 30 дней (согласно принципам GDPR). Право на переносимость: Поскольку мы используем открытые стандарты, вы можете запросить экспорт своих данных.' },
           { heading: '5. Открытый код', content: 'Вы можете лично проверить, как обрабатываются ваши данные, изучив наш исходный код в репозитории. Мы поощряем аудит безопасности со стороны сообщества.' }
         ]
+      }
+    },
+    tutorial: {
+      welcomeTitle: 'Добро пожаловать в Blend!',
+      welcomeMessage: 'Давайте покажем вам вашу новую социальную платформу.',
+      skip: 'Пропустить',
+      next: 'Далее',
+      finish: 'Готово',
+      steps: {
+        sidebar: 'Навигация',
+        sidebarDesc: 'Здесь доступ к Ленте, Чатам, Обзору и Настройкам.',
+        feed: 'Умная Лента',
+        feedDesc: 'Переключайтесь между "Миксом" (Алгоритмы) и "Хронологией". Используйте ползунки для настройки!',
+        create: 'Самовыражение',
+        createDesc: 'Публикуйте текст, фото, видео или записывайте голосовые заметки.',
+        widgets: 'Тренды и Статистика',
+        widgetsDesc: 'Следите за популярным и смотрите, кто сейчас онлайн.'
       }
     }
   },
@@ -663,6 +697,23 @@ export const TRANSLATIONS = {
           { heading: '4. 您的权利', content: '删除权：您可以随时删除您的帐户。我们承诺在 30 天内从数据库中删除您的个人数据（根据 GDPR 原则）。可移植权：由于我们使用开放标准，您可以请求导出您的数据。' },
           { heading: '5. 开源', content: '您可以通过检查存储库中的源代码来亲自验证您的数据是如何被处理的。我们鼓励社区进行安全审计。' }
         ]
+      }
+    },
+    tutorial: {
+      welcomeTitle: '欢迎来到 Blend！',
+      welcomeMessage: '让我们带您参观您的新社交平台。',
+      skip: '跳过',
+      next: '下一步',
+      finish: '完成',
+      steps: {
+        sidebar: '导航',
+        sidebarDesc: '从侧边栏访问您的动态、消息、探索和设置。',
+        feed: '混合动态',
+        feedDesc: '在“混合”（算法）和“时间顺序”之间切换。使用滑块调整您看到的内容！',
+        create: '表达自己',
+        createDesc: '即时分享文字、图片、视频或录制语音笔记。',
+        widgets: '趋势与统计',
+        widgetsDesc: '查看现在的热门话题以及谁在线。'
       }
     }
   }
