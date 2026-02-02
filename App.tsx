@@ -144,9 +144,16 @@ const App: React.FC = () => {
     if (storedSession) {
       try {
         const { user } = JSON.parse(storedSession);
-        setCurrentUser(user);
+        // Hydrate user to ensure new fields (followers, following) exist
+        const hydratedUser: User = {
+            ...user,
+            followers: user.followers || [],
+            following: user.following || [],
+            banner: user.banner || undefined
+        };
+        setCurrentUser(hydratedUser);
         setIsAuthenticated(true);
-        console.log(`[Auto-Login] Welcome back, ${user.name}`);
+        console.log(`[Auto-Login] Welcome back, ${hydratedUser.name}`);
       } catch (error) {
         console.error("Session parse error", error);
         localStorage.removeItem(SESSION_KEY);
@@ -412,8 +419,9 @@ const App: React.FC = () => {
 
   const handleFollowToggle = (targetUserId: string) => {
       // Mock follow logic: updates current user's following list
-      const isFollowing = currentUser.following.includes(targetUserId);
-      let newFollowing = [...currentUser.following];
+      const currentFollowing = currentUser.following || []; // Safe default
+      const isFollowing = currentFollowing.includes(targetUserId);
+      let newFollowing = [...currentFollowing];
       
       if (isFollowing) {
           newFollowing = newFollowing.filter(id => id !== targetUserId);
@@ -646,11 +654,11 @@ const App: React.FC = () => {
           
           <div className="flex gap-4 mb-6 border-b border-[var(--border)] pb-4">
              <div className="flex gap-1">
-               <span className="text-[var(--text-main)] font-bold">{userToView.following.length}</span>
+               <span className="text-[var(--text-main)] font-bold">{userToView.following?.length || 0}</span>
                <span className="text-[var(--text-muted)]">{t.profile.following}</span>
              </div>
              <div className="flex gap-1">
-               <span className="text-[var(--text-main)] font-bold">{userToView.followers.length}</span>
+               <span className="text-[var(--text-main)] font-bold">{userToView.followers?.length || 0}</span>
                <span className="text-[var(--text-muted)]">{t.profile.followers}</span>
              </div>
           </div>

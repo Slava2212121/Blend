@@ -42,7 +42,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, currentUser, onLike, onCommen
   // PERMISSIONS
   const isAuthor = currentUser.id === post.author.id;
   const isAdmin = currentUser.role === 'ADMIN';
-  const isFollowing = currentUser.following.includes(post.author.id);
+  const isFollowing = currentUser.following?.includes(post.author.id); // Fixed: optional chaining
 
   // HIDDEN LOGIC
   const isHidden = post.isHidden && !forceReveal;
